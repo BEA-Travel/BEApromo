@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEA Promo • Cupons e Descontos incríveis!</title>
+  <meta name="description" content="BEA Promo: cupons fixos e promoções temporárias com atualização automática via promotions.json e integração Awin.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#0f172a; --muted:#64748b; --bg:#f7f7fb; --card:#ffffff; --radius:16px;
+      --grad: linear-gradient(135deg,#7c3aed,#ec4899 35%,#f97316 65%,#22c55e);
+      --shadow: 0 10px 24px rgba(0,0,0,.10);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color: var(--ink); background: var(--bg);}
+    header {
+      background: var(--grad);
+      color:#fff; text-align:center; padding:56px 16px 88px;
+      border-radius:0 0 48% 48% / 14%; box-shadow: var(--shadow);
+    }
+    header h1 { margin:0 0 10px; font-size: clamp(26px, 5vw, 40px); font-weight:800; letter-spacing:-.3px; }
+    header p { margin:0; opacity:.95; font-size: clamp(14px, 2.5vw, 18px); }
+    main { max-width:1120px; margin:-48px auto 48px; padding:0 18px; }
+    section { margin-bottom:34px; }
+    h3 { margin:0 0 14px; font-size:20px; color:#0b1326; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:18px; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); position: relative; overflow:hidden; }
+    .card::before, .card::after { content:""; position:absolute; width:22px; height:22px; background: var(--bg); border-radius:50%; top: 46%; }
+    .card::before { left:-11px; } .card::after { right:-11px; }
+    .badge { display:inline-block; background:#e2e8f0; color:#0f172a; font-weight:700; font-size:12px; padding:6px 10px; border-radius:999px; }
+    .title { margin:12px 0 6px; font-size:18px; font-weight:800; }
+    .desc { margin:0 0 12px; color: var(--muted); font-size:14px; min-height:36px; }
+    .dates { font-size: 13px; color:#111827; background:#fff1f1; border:1px dashed #f9a8d4; padding:8px 10px; border-radius: 10px; display:inline-block; margin: 8px 0 14px; }
+    .btn-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    a.btn, button.btn { appearance:none; border:none; cursor:pointer; text-decoration:none; background: #111827; color:#fff; padding: 12px 16px; border-radius: 12px; font-weight:800; box-shadow: 0 8px 18px rgba(17,24,39,.25); transition: transform .2s ease, box-shadow .2s ease; }
+    a.btn:hover, button.btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(17,24,39,.35);}
+    button.ghost { background:#eef2ff; color:#3730a3; border:1px dashed #c7d2fe; }
+    .fine { font-size:12px; color:#9aa1ab; margin-top:8px; }
+    .logo { font-weight: 900; letter-spacing:.3px; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#111; color:#fff; padding:3px 6px; border-radius:6px; font-size: 12px; }
+    .code { margin: 6px 0 10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .btn.sm { padding:8px 10px; font-weight:700; border-radius:8px; }
+    .subtle { color:#6b7280; font-size:13px; margin-top:-4px; }
+    .expired { opacity:.45; filter: grayscale(0.2); }
+    .toolbar { display:flex; gap:10px; align-items:center; justify-content:flex-end; margin-bottom:10px; }
+    .pill { font-size:12px; border-radius:999px; padding:6px 10px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; }
+    .pill.active { border-color:#22c55e; background:#ecfdf5; color:#065f46; }
+    .empty { text-align:center; color:#6b7280; padding:12px 0; }
+    /* fun color ribbons on cards */
+    .ribbon { position:absolute; height:4px; left:0; right:0; top:0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="logo">🎉 BEA Promo Cupons e Descontos incríveis!</h1>
+    <p>Cupons fixos multimarcas + promoções por tempo limitado • Parceiro <strong>Awin</strong></p>
+  </header>
+
+  <main>
+    <section>
+      <h3>💎 Cupons Fixos</h3>
+      <p class="subtle">Sempre disponíveis e prontos para usar.</p>
+      <div class="grid" id="fixed-grid"></div>
+    </section>
+
+    <section>
+      <div class="toolbar">
+        <button class="pill active" id="show-valid">Válidos</button>
+        <button class="pill" id="show-expired">Expirados</button>
+      </div>
+      <h3>⏰ Cupons Temporários</h3>
+      <p class="subtle">Este bloco lê automaticamente <code>promotions.json</code> (se existir no repositório).</p>
+      <div class="grid" id="temp-grid"></div>
+      <div id="temp-empty" class="empty" style="display:none;">Sem cupons temporários no momento.</div>
+    </section>
+  </main>
+
+  <footer style="text-align:center; color:#6b7280; padding: 28px 12px 40px; font-size: 14px;">
+    © 2025 BEA Promo • Feito com ❤️ • Awin affiliate
+  </footer>
+
+  <script>
+    const FIXED_DEALS = [{"name": "Aerow - E‑Sim", "link": "https://tidd.ly/464uWrG"}, {"name": "Booking.com", "link": "https://tidd.ly/48AWeah"}, {"name": "Clube Giro", "link": "https://tidd.ly/3W8yR0v"}, {"name": "AliExpress", "link": "https://tidd.ly/4oq2FBx"}];
+    let TEMP_PROMOS = [];
+
+    const ribbons = ['#22c55e','#06b6d4','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#f97316'];
+
+    function parseBrDate(s) {
+      if(!s) return null;
+      const parts = s.trim().split(' ');
+      const [d,m,y] = parts[0].split('/').map(Number);
+      let hh=0, mm=0, ss=0;
+      if(parts[1]) { const t = parts[1].split(':'); hh=+t[0]||0; mm=+t[1]||0; ss=+t[2]||0; }
+      return new Date(y, (m-1), d, hh, mm, ss);
+    }
+    function fmtDate(d) {
+      if(!(d instanceof Date)) return '';
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+    function copyText(text, el) {
+      if(!text) return;
+      navigator.clipboard.writeText(text).then(()=> { el.textContent='Copiado ✔'; setTimeout(()=> el.textContent='Copiar', 1200); });
+    }
+    function copyLink(btn){
+      const url = btn.getAttribute('data-link');
+      navigator.clipboard.writeText(url).then(() => { btn.textContent='Copiado ✔'; setTimeout(()=> btn.textContent='Copiar link', 1200); });
+    }
+
+    function createFixedCards() {
+      const grid = document.getElementById('fixed-grid');
+      grid.innerHTML = '';
+      FIXED_DEALS.forEach((deal, i) => {
+        const ribbon = ribbons[i % ribbons.length];
+        grid.insertAdjacentHTML('beforeend', `
+          <article class="card">
+            <span class="ribbon" style="background:${ribbon}"></span>
+            <span class="badge">Cupom Fixo</span>
+            <h2 class="title">${deal.name}</h2>
+            <p class="desc">Oferta permanente — sempre disponível.</p>
+            <div class="btn-row">
+              <a class="btn" href="${deal.link}" target="_blank" rel="nofollow noopener">Usar Cupom</a>
+              <button class="btn ghost" data-link="${deal.link}" onclick="copyLink(this)">Copiar link</button>
+            </div>
+            <p class="fine">Links com comissão (Awin).</p>
+          </article>
+        `);
+      });
+    }
+
+    function renderTemp(showExpired=false){
+      const now = new Date();
+      const grid = document.getElementById('temp-grid');
+      const empty = document.getElementById('temp-empty');
+      grid.innerHTML = '';
+      let count = 0;
+      TEMP_PROMOS.forEach((p, idx) => {
+        const start = parseBrDate(p.starts);
+        const end = parseBrDate(p.ends);
+        const expired = end && end < now;
+        if(!showExpired && expired) return;
+        const leftMs = end ? (end - now) : null;
+        const daysLeft = leftMs ? Math.ceil(leftMs / (1000*60*60*24)) : null;
+        const urgency = (!expired && daysLeft!==null) ? (daysLeft<=1 ? '🔥 Expira hoje' : `⏰ Expira em ${daysLeft} dia(s)`) : (expired ? '⛔ Expirado' : '');
+        const codeBlock = p.code ? `<div class="code">Código: <span class="kbd">${p.code}</span> <button class="btn ghost sm" onclick="copyText('${p.code}', this)">Copiar</button></div>` : '';
+        const cls = expired ? 'card expired' : 'card';
+        const ribbon = ribbons[(idx+3) % ribbons.length];
+        grid.insertAdjacentHTML('beforeend', `
+          <article class="${cls}">
+            <span class="ribbon" style="background:${ribbon}"></span>
+            <span class="badge">${p.advertiser || 'Temporário'}</span>
+            <h2 class="title">${p.title || 'Oferta Especial'}</h2>
+            <p class="desc">${p.desc || ''}</p>
+            ${codeBlock}
+            <div class="dates">Válido de <strong>${start?fmtDate(start):'-'}</strong> até <strong>${end?fmtDate(end):'-'}</strong> — ${urgency}</div>
+            <div class="btn-row">
+              <a class="btn" href="${p.link}" target="_blank" rel="nofollow noopener">Usar Cupom</a>
+              <button class="btn ghost" data-link="${p.link}" onclick="copyLink(this)">Copiar link</button>
+            </div>
+            <p class="fine">Link com comissão (sem custo extra para você).</p>
+          </article>
+        `);
+        count++;
+      });
+      empty.style.display = count ? 'none' : 'block';
+    }
+
+    async function loadPromotions() {
+      try {
+        const res = await fetch('promotions.json', { cache: 'no-store' });
+        if(!res.ok) throw new Error('no json');
+        const data = await res.json();
+        TEMP_PROMOS = Array.isArray(data) ? data : [];
+      } catch (e) {
+        TEMP_PROMOS = []; // sem arquivo json ainda
+      } finally {
+        renderTemp(false);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const showValidBtn = document.getElementById('show-valid');
+      const showExpBtn = document.getElementById('show-expired');
+      showValidBtn.addEventListener('click', ()=>{ showValidBtn.classList.add('active'); showExpBtn.classList.remove('active'); renderTemp(false); });
+      showExpBtn.addEventListener('click', ()=>{ showExpBtn.classList.add('active'); showValidBtn.classList.remove('active'); renderTemp(true); });
+      createFixedCards();
+      loadPromotions();
+    });
+  </script>
+
+  <!-- AWIN MasterTag (troque o ID se seu painel mostrar outro) -->
+  <script src="https://www.dwin2.com/pub.2108535.min.js"></script>
+</body>
+</html>
